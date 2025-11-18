@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>300 YouTube Ultra Low Video Wall</title>
+<style>
+    body { font-family: Arial; text-align: center; background:#000; color:white; }
+    #grid {
+        display: grid;
+        grid-template-columns: repeat(15, 1fr); /* 15 x 20 = 300 screens */
+        gap: 3px;
+        margin-top: 20px;
+        padding: 10px;
+    }
+    iframe {
+        width: 100%;
+        height: 70px;
+        border: 1px solid #111;
+        background: #000;
+    }
+    input {
+        width: 60%;
+        padding: 10px;
+        font-size: 18px;
+        border-radius: 6px;
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 18px;
+        margin-left: 10px;
+        cursor: pointer;
+        border-radius: 6px;
+    }
+</style>
+</head>
+
+<body>
+<h2>300 YouTube Video Wall (Ultra Low Quality – Auto Mute + Autoplay)</h2>
+<p>Paste any normal YouTube link:</p>
+
+<input type="text" id="ytURL" placeholder="https://www.youtube.com/watch?v=###########">
+<button onclick="loadVideos()">Load Video</button>
+
+<div id="grid"></div>
+
+<script>
+function convertToEmbed(url) {
+    try {
+        let videoID = "";
+
+        if (url.includes("watch?v=")) {
+            videoID = url.split("watch?v=")[1].split("&")[0];
+        } else if (url.includes("youtu.be/")) {
+            videoID = url.split("youtu.be/")[1].split("?")[0];
+        } else {
+            return null;
+        }
+
+        return `https://www.youtube.com/embed/${videoID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoID}&vq=tiny`;
+    } catch {
+        return null;
+    }
+}
+
+function loadVideos() {
+    const inputURL = document.getElementById("ytURL").value.trim();
+    const embed = convertToEmbed(inputURL);
+
+    if (!embed) {
+        alert("Invalid YouTube URL!");
+        return;
+    }
+
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    for (let i = 0; i < 300; i++) {
+        const iframe = document.createElement("iframe");
+        iframe.src = embed;
+        iframe.allow = "autoplay; encrypted-media";
+        grid.appendChild(iframe);
+    }
+}
+</script>
+
+</body>
+</html>
