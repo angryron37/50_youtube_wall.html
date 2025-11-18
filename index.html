@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>YouTube Wall – Ultra Low</title>
+  <title>YouTube Wall – Ultra Low Looping</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -20,7 +20,7 @@
     }
     iframe {
       width: 100%;
-      height: 80px;   /* small for performance */
+      height: 80px;
       border: 1px solid #111;
       background: #000;
     }
@@ -40,12 +40,14 @@
       cursor: pointer;
       border-radius: 6px;
       border: none;
+      background: #222;
+      color: #fff;
     }
   </style>
 </head>
 <body>
 
-  <h2>YouTube Video Wall (Muted + Autoplay + Ultra Low)</h2>
+  <h2>YouTube Video Wall (Muted + Autoplay + Ultra Low + Loop)</h2>
   <p>Paste any YouTube link (normal, shorts, or youtu.be) and press Load:</p>
 
   <input id="ytURL" 
@@ -55,67 +57,54 @@
   <div id="grid"></div>
 
   <script>
-    const TOTAL_SCREENS = 50; // 👈 change this to 100, 200, etc if it works fine
+    const TOTAL_SCREENS = 50; // change to 100 / 200 / 300 etc
 
     function getYouTubeId(url) {
       try {
-        // Remove spaces
         url = url.trim();
-
-        // If no protocol, add https
-        if (!url.startsWith("http")) {
-          url = "https://" + url;
-        }
-
-        // Normalize mobile links
+        if (!url.startsWith("http")) url = "https://" + url;
         url = url.replace("m.youtube.com", "www.youtube.com");
-
-        let videoID = "";
+        let id = "";
 
         if (url.includes("watch?v=")) {
-          videoID = url.split("watch?v=")[1].split("&")[0];
+          id = url.split("watch?v=")[1].split("&")[0];
         } else if (url.includes("youtu.be/")) {
-          videoID = url.split("youtu.be/")[1].split("?")[0];
+          id = url.split("youtu.be/")[1].split("?")[0];
         } else if (url.includes("shorts/")) {
-          videoID = url.split("shorts/")[1].split("?")[0];
+          id = url.split("shorts/")[1].split("?")[0];
         }
 
-        if (!videoID || videoID.length < 5) return null;
-        return videoID;
-      } catch (e) {
-        console.error("Error parsing URL:", e);
+        return (id && id.length > 5) ? id : null;
+      } catch {
         return null;
       }
     }
 
-    function makeEmbedUrl(videoID) {
-      // autoplay + mute + loop + ultra low quality
-      return `https://www.youtube.com/embed/${videoID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoID}&vq=tiny`;
+    function makeEmbedUrl(id) {
+      return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&vq=tiny`;
     }
 
     function loadVideos() {
-      const inputURL = document.getElementById("ytURL").value;
-      const videoID = getYouTubeId(inputURL);
+      const url = document.getElementById("ytURL").value;
+      const videoID = getYouTubeId(url);
 
       if (!videoID) {
         alert("Invalid YouTube URL. Paste a normal / shorts / youtu.be link.");
         return;
       }
 
-      const embed = makeEmbedUrl(videoID);
+      const embedURL = makeEmbedUrl(videoID);
       const grid = document.getElementById("grid");
-      grid.innerHTML = ""; // clear old
+      grid.innerHTML = "";
 
       for (let i = 0; i < TOTAL_SCREENS; i++) {
         const iframe = document.createElement("iframe");
-        iframe.src = embed;
+        iframe.src = embedURL;
         iframe.allow = "autoplay; encrypted-media";
         iframe.setAttribute("frameborder", "0");
-        iframe.setAttribute("allowfullscreen", "1");
+        iframe.setAttribute("allowfullscreen", "");
         grid.appendChild(iframe);
       }
-
-      console.log("Loaded", TOTAL_SCREENS, "iframes with", embed);
     }
   </script>
 
